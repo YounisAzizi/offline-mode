@@ -14,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isStarted = ref.watch(isTimeStartedProvider).isTimeStarted;
     final isInternetConnected = ref.watch(networkCheckerProvider).isConnected;
+    final users = ref.watch(userLocalStoreProvider).users;
 
     return Scaffold(
       body: Center(
@@ -21,37 +22,55 @@ class HomeScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  Duration difference = Duration.zero;
+                  if (user.endTime.isNotEmpty && user.startTime.isNotEmpty) {
+                    final startTime = DateTime.parse(user.startTime);
+                    final endTime = DateTime.parse(user.endTime);
+                    difference = endTime.difference(startTime);
+                  }
+                  return ListTile(
+                    title: Text('${user.name} ${user.lastName}'),
+                    subtitle: Text(
+                      'Start Time: ${user.startTime}\nEnd Time: ${user.endTime}'
+                      '\nDeference: ${difference.inHours}:${difference.inMinutes}:${difference.inSeconds}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    trailing: Icon(
+                      !user.isStarted ? Icons.check_circle : Icons.cancel,
+                      color: !user.isStarted ? Colors.green : Colors.red,
+                    ),
+                  );
+                },
+              ),
+            ),
+            Expanded(child: Text('')),
             ButtonWidget(
               text: isStarted ? 'Start Time' : 'End Time',
               onPressed: () async {
-                if(isInternetConnected){
+                if (!isInternetConnected) {
                   print('Internet is connected');
-                }else{
+                } else {
                   if (isStarted) {
                     await ref
                         .read(userLocalStoreProvider.notifier)
                         .insertUser(defaultUserModel);
-                  }
-                  else {
+                  } else {
                     await ref
                         .read(userLocalStoreProvider.notifier)
                         .updateUserEndTime(currentUserId, DateTime.now());
                   }
-                  final users = ref.watch(userLocalStoreProvider).users;
-                  for (var e in users) {
-                    print('id: ${e.id}');
-                    print('name: ${e.name}');
-                    print('last name: ${e.lastName}');
-                    print('start time: ${e.startTime}');
-                    print('end time: ${e.endTime}');
-                  }
-                  print(users.length);
-
                   ref.read(isTimeStartedProvider.notifier).toggleIsStarted();
                 }
-
               },
             ),
+            const SizedBox(
+              height: 30,
+            )
           ],
         ),
       ),

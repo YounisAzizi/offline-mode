@@ -26,10 +26,18 @@ class DatabaseHelper {
           name TEXT,
           lastName TEXT,
           startTime TEXT,
-          endTime TEXT
+          endTime TEXT,
+          isStarted INTEGER
         )
       ''');
-        });
+        },
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE $tableName ADD COLUMN isStarted INTEGER DEFAULT 0');
+        }
+      },
+
+    );
   }
 
   Future<void> insertUser(UserModel user) async {
@@ -53,7 +61,9 @@ class DatabaseHelper {
     final db = await database;
     await db.update(
       tableName,
-      {'endTime': newEndTime.toIso8601String()},
+      {'endTime': newEndTime.toIso8601String(),
+      'isStarted':0
+      },
       where: 'id = ?',
       whereArgs: [userId],
     );

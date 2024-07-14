@@ -1,5 +1,3 @@
-
-
 import '../const/const.dart';
 
 final defaultUserModel = UserModel(
@@ -8,8 +6,8 @@ final defaultUserModel = UserModel(
   lastName: 'Doe',
   startTime: '${DateTime.now()}',
   endTime: '',
+  isStarted: true,
 );
-
 
 class UserModel {
   final String id;
@@ -17,6 +15,7 @@ class UserModel {
   final String lastName;
   final String startTime;
   final String endTime;
+  final bool isStarted;
 
   const UserModel({
     required this.id,
@@ -24,6 +23,7 @@ class UserModel {
     required this.lastName,
     required this.startTime,
     required this.endTime,
+    required this.isStarted,
   });
 
   Map<String, dynamic> toJson() {
@@ -33,6 +33,7 @@ class UserModel {
       'lastName': lastName,
       'startTime': startTime,
       'endTime': endTime,
+      'isStarted': isStarted ? 1 : 0, // convert bool to int
     };
   }
 
@@ -43,6 +44,7 @@ class UserModel {
       lastName: json['lastName'],
       startTime: json['startTime'],
       endTime: json['endTime'],
+      isStarted: json['isStarted'] == 1, // convert int to bool
     );
   }
 
@@ -52,6 +54,7 @@ class UserModel {
     String? lastName,
     String? startTime,
     String? endTime,
+    bool? isStarted,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -59,7 +62,7 @@ class UserModel {
       lastName: lastName ?? this.lastName,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
+      isStarted: isStarted ?? this.isStarted,
     );
   }
 }
-

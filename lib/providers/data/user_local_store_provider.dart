@@ -13,9 +13,18 @@ class UserLocalStoreNotifier extends ChangeNotifier {
   DatabaseHelper databaseHelper = DatabaseHelper(tableName: 'users');
 
   List<UserModel> users = [];
+  UserLocalStoreNotifier() {
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    users = await databaseHelper.getUsers();
+    notifyListeners();
+  }
 
   Future<void> insertUser(UserModel userModel) async {
-    users.removeWhere((user) => user.id == userModel.id);
+    // users.removeWhere((user) => user.id == userModel.id);
+    users.clear();
     await databaseHelper.insertUser(userModel);
     List<UserModel> user = await databaseHelper.getUsers();
     users.addAll(user);
