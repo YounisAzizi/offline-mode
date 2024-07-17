@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_mode/const/const.dart';
 import 'package:offline_mode/providers/data/user_local_store_provider.dart';
+import 'package:offline_mode/repositories/notification_repository.dart';
 import 'package:offline_mode/widgets/button_widget.dart';
 import '../models/user_model.dart';
 import '../providers/data/network_checker_provider.dart';
@@ -48,17 +49,22 @@ class HomeScreen extends ConsumerWidget {
                 },
               ),
             ),
-            Expanded(child: Text('')),
             ButtonWidget(
               text: isStarted ? 'Start Time' : 'End Time',
               onPressed: () async {
                 if (!isInternetConnected) {
-                  print('Internet is connected');
+                  debugPrint('Internet is connected');
                 } else {
                   if (isStarted) {
                     await ref
                         .read(userLocalStoreProvider.notifier)
                         .insertUser(defaultUserModel);
+                   await NotificationService().zonedScheduleNotification(
+                        title: 'Younis',
+                        body: 'its passed 1 minute from your startTime',
+                        startTime:  const Duration(minutes: 1),
+                        id: 2
+                    );
                   } else {
                     await ref
                         .read(userLocalStoreProvider.notifier)
